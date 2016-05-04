@@ -3,27 +3,28 @@
 
 #include <map>
 #include <string>
+#include <fstream>
+#include <map>
 
+#include "GpioIo.h"
 namespace Arduino
 {
 
 
-enum ArduinoGpioOutputLevel
-{
-   LOW,
-   HIGH
-};
 
-enum ArduinoGpioMode
-{
-   INPUT,
-   OUTPUT
-};
 
 class ArduinoOnLinux
 {
 public:
    ArduinoOnLinux();
+
+   bool setMode(ArduinoGpioMode mode);
+
+protected:
+
+   std::map<int, GpioIo*> theGpios;
+
+
 };
 
 void digitalWrite(int, ArduinoGpioOutputLevel);
