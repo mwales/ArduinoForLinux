@@ -29,7 +29,7 @@ public:
 
    void setLevel(ArduinoGpioOutputLevel lvl);
 
-   bool getLevel(ArduinoGpioOutputLevel* lvl);
+   ArduinoGpioOutputLevel getLevel();
 
    void setMode(ArduinoGpioMode mode);
 

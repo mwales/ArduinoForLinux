@@ -59,9 +59,13 @@ void GpioIo::setLevel(ArduinoGpioOutputLevel lvl)
    theGpioValueFile.seekp(std::ios::beg);
 }
 
-bool GpioIo::getLevel(ArduinoGpioOutputLevel* lvl)
+ArduinoGpioOutputLevel GpioIo::getLevel()
 {
-   return true;
+   int val;
+   theGpioValueFile >> val;
+   theGpioValueFile.seekg(std::ios::beg);
+
+   return (val ? HIGH : LOW);
 }
 
 void GpioIo::setMode(ArduinoGpioMode mode)

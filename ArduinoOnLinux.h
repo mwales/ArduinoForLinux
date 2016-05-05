@@ -16,11 +16,22 @@ namespace Arduino
 class ArduinoOnLinux
 {
 public:
-   ArduinoOnLinux();
 
-   bool setMode(ArduinoGpioMode mode);
+   static ArduinoOnLinux* getInstance();
+
+   void digitalWrite(int, ArduinoGpioOutputLevel);
+
+   void pinMode(int, ArduinoGpioMode);
+
+   ArduinoGpioOutputLevel digitalRead(int);
 
 protected:
+
+   ArduinoOnLinux();
+
+   GpioIo* GetGpio(int pinNum);
+
+   static ArduinoOnLinux* theInstance;
 
    std::map<int, GpioIo*> theGpios;
 
