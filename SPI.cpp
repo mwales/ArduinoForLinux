@@ -1,4 +1,5 @@
 #include "SPI.h"
+#include <iostream>
 
 namespace Arduino
 {
@@ -33,7 +34,7 @@ void Spi::setClockDivider(uint8_t divider)
    std::cerr << "Not implemented" << std::endl;
 }
 
-void Spi::setDataMode(SpiDataMode mode, int slaveSelectPin = 0)
+void Spi::setDataMode(SpiDataMode mode, int slaveSelectPin)
 {
    std::cerr << "Not implemented" << std::endl;
 }

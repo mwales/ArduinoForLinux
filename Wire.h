@@ -1,3 +1,4 @@
+
 #pragma once
 
 #include <stdint.h>
@@ -39,6 +40,6 @@ public:
    // void onReceive(function pointer);
 };
 
-I2cArduino Wire;
+extern I2cArduino Wire;
 
 }

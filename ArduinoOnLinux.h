@@ -7,6 +7,8 @@
 #include <map>
 
 #include "GpioIo.h"
+#include "ArduinoSerial.h"
+
 namespace Arduino
 {
 
