@@ -145,10 +145,38 @@ int I2cArduino::endTransmission(bool stop)
    uint8_t command = theDataBuffer.front();
    theDataBuffer.erase(theDataBuffer.begin());
 
-   int status = i2c_smbus_write_block_data(theDevFileFd,
+   assert(theDataBuffer.size() <= 16);
+
+   uint8_t i2cBuffer[16];
+   int i = 0;
+   for(auto&& dataByte : theDataBuffer)
+   {
+      i2cBuffer[i++] = dataByte;
+   }
+
+   int status = i2c_smbus_write_i2c_block_data(theDevFileFd,
                                            command,
                                            theDataBuffer.size(),
-                                           theDataBuffer.data());
+                                           i2cBuffer);
+
+   std::ostringstream oss;
+   oss << "Data Stream Out = 0x" << std::hex << (int) command;
+   for(auto&& dataByte : theDataBuffer)
+   {
+      oss << " 0x" << std::hex << (int) dataByte;
+   }
+
+   std::cout << oss.str() << std::endl;
+
+
+   std::ostringstream oss2;
+   oss2 << "Data Stream Out = 0x" << std::hex << (int) command;
+   for(int i = 0; i < theDataBuffer.size(); i++)
+   {
+      oss2 << " 0x" << std::hex << (int) i2cBuffer[i];
+   }
+
+   std::cout << oss2.str() << std::endl;
 
    std::cout << "Wrote " << std::dec << theDataBuffer.size() + 1 << " to I2C device 0x"
              << std::hex << (int) theAddress << std::dec
