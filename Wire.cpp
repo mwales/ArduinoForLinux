@@ -12,6 +12,10 @@
 
 // Implentation of Arduino Wire library
 
+// Uncomment to enable I2C debugging
+//#define WIRE_DEBUGGING_ENABLED
+//#define WIRE_SIMULATION
+
 namespace Arduino
 {
 
@@ -40,6 +44,11 @@ void I2cArduino::begin()
 {
    std::cout << __FUNCTION__ << " (no params)" << std::endl;
 
+#ifdef WIRE_SIMULATION
+   std::cout << "WIRE SIMULATION " << __PRETTY_FUNCTION__ << std::endl;
+   return;
+#endif
+
    if (theDevFileFd == -1)
    {
       const char* DEFAULT_I2C_BUS = "/dev/i2c-1";
@@ -63,13 +72,19 @@ void I2cArduino::begin()
 
 void I2cArduino::begin(uint8_t address, uint8_t busNum)
 {
-   std::cout << __FUNCTION__ << std::endl;
+   std::cout << __FUNCTION__ << "(" << std::hex << (int) address << std::dec << ", "
+             << (int) busNum << ")" << std::endl;
 
    //assert (busNum >= 1);
    if (busNum <= 0)
    {
       std::cerr << "WTF, bus number invalid" << std::endl;
    }
+
+#ifdef WIRE_SIMULATION
+   std::cout << "WIRE SIMULATION " << __PRETTY_FUNCTION__ << std::endl;
+   return;
+#endif
 
    if (theDevFileFd == -1)
    {
@@ -107,8 +122,6 @@ uint8_t I2cArduino::requestFrom(uint8_t address, uint8_t quantity, bool stop)
 
 void I2cArduino::beginTransmission(uint8_t address)
 {
-   std::cout << __FUNCTION__ << std::endl;
-
    SetAddress(address);
 
    theDataBuffer.clear();
@@ -118,75 +131,45 @@ void I2cArduino::beginTransmission(uint8_t address)
 
 int I2cArduino::endTransmission(bool stop)
 {
-   std::cout << __FUNCTION__ << std::endl;
-
    if (theDataBuffer.empty())
    {
       std::cerr << "Nothing to send over the I2c transmission, buffer empty" << std::endl;
       return 0;
    }
 
-   if (theDataBuffer.size() == 2)
-   {
-      // Single byte write
-      int status = i2c_smbus_write_byte_data(theDevFileFd, theDataBuffer.front(), theDataBuffer.back());
-      std::cout << "Special single byte write of C= 0x" << std::hex << (int) theDataBuffer.front()
-                << " and d= 0x" << std::hex << (int) theDataBuffer.back()
-                << " and returned " << (status ? "failure" : "success") << std::endl;
-
-      if (status)
-      {
-         std::cerr << "Error send the special write command: " << strerror(errno) << std::endl;
-      }
-
-      return 1;
-   }
-
    uint8_t command = theDataBuffer.front();
    theDataBuffer.erase(theDataBuffer.begin());
 
-   assert(theDataBuffer.size() <= 16);
+   assert(theDataBuffer.size() <= 32);
 
-   uint8_t i2cBuffer[16];
-   int i = 0;
-   for(auto&& dataByte : theDataBuffer)
-   {
-      i2cBuffer[i++] = dataByte;
-   }
-
-   int status = i2c_smbus_write_i2c_block_data(theDevFileFd,
-                                           command,
-                                           theDataBuffer.size(),
-                                           i2cBuffer);
-
+#ifdef WIRE_DEBUGGING_ENABLED
    std::ostringstream oss;
-   oss << "Data Stream Out = 0x" << std::hex << (int) command;
+   oss << "I2C Data Out = 0x" << std::hex << (int) command;
    for(auto&& dataByte : theDataBuffer)
    {
       oss << " 0x" << std::hex << (int) dataByte;
    }
-
    std::cout << oss.str() << std::endl;
+#endif
 
+#ifdef WIRE_SIMULATION
+   std::cout << "WIRE SIMULATION " << __PRETTY_FUNCTION__ << std::endl;
+   return theDataBuffer.size();
+#endif
 
-   std::ostringstream oss2;
-   oss2 << "Data Stream Out = 0x" << std::hex << (int) command;
-   for(int i = 0; i < theDataBuffer.size(); i++)
-   {
-      oss2 << " 0x" << std::hex << (int) i2cBuffer[i];
-   }
+   int status = i2c_smbus_write_i2c_block_data(theDevFileFd,
+                                               command,
+                                               theDataBuffer.size(),
+                                               theDataBuffer.data());
 
-   std::cout << oss2.str() << std::endl;
-
-   std::cout << "Wrote " << std::dec << theDataBuffer.size() + 1 << " to I2C device 0x"
-             << std::hex << (int) theAddress << std::dec
-             << ": " << (status ? "failed" : "success") << std::endl;
    return theDataBuffer.size();
 }
 
 uint8_t I2cArduino::write(uint8_t byteOfData)
 {
+#ifdef WIRE_DEBUGGING_ENABLED
    std::cout << __FUNCTION__ << " single byte = 0x" << std::hex << (int) byteOfData << std::endl;
+#endif
 
    theDataBuffer.push_back(byteOfData);
    return 1;
@@ -194,8 +177,9 @@ uint8_t I2cArduino::write(uint8_t byteOfData)
 
 uint8_t I2cArduino::write(char const * string)
 {
+#ifdef WIRE_DEBUGGING_ENABLED
    std::cout << __FUNCTION__ << std::endl;
-
+#endif
    int i = 0;
    while(string[0] != 0)
    {
@@ -211,6 +195,7 @@ uint8_t I2cArduino::write(char const * string)
 uint8_t I2cArduino::write(char const * dataBuf, uint8_t length)
 {
    std::cout << __FUNCTION__ << std::endl;
+   assert(false);
 
    return 0;
 }
@@ -218,6 +203,7 @@ uint8_t I2cArduino::write(char const * dataBuf, uint8_t length)
 uint8_t I2cArduino::available()
 {
    std::cout << __FUNCTION__ << std::endl;
+   assert(false);
 
    return 0;
 }
@@ -225,12 +211,17 @@ uint8_t I2cArduino::available()
 uint8_t I2cArduino::read()
 {
    std::cout << __FUNCTION__ << std::endl;
+   assert(false);
 
    return 0;
 }
 
 void I2cArduino::SetAddress(uint8_t address)
 {
+#ifdef WIRE_SIMULATION
+   return;
+#endif
+
    if (address == theAddress)
    {
       return;
