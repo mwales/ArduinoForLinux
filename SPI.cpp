@@ -4,6 +4,8 @@
 namespace Arduino
 {
 
+Spi SPI;
+
 void Spi::begin()
 {
    std::cerr << "Not implemented" << std::endl;

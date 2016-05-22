@@ -73,6 +73,6 @@ public:
    void usingInterrupt(int intNumber);
 };
 
-Spi SPI;
+extern Spi SPI;
 
 }
