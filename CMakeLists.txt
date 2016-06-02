@@ -1,7 +1,9 @@
 cmake_minimum_required (VERSION 2.6)
 
 
-set(SOURCE_FILES ArduinoOnLinux.cpp GpioIo.cpp)
+set(SOURCE_FILES ArduinoOnLinux.cpp 
+                 GpioIo.cpp
+                 SPI.cpp)
 
 add_library(arduino ${SOURCE_FILES})
 
