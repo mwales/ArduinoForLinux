@@ -102,6 +102,11 @@ public:
 protected:
 
    bool openSpiBus(int bus, int cs);
+   void transfer(uint8_t byteOfData);
+   void transfer(char* buf, int size);
+   void transfer(uint16_t wordOfData);
+
+   void usingInterrupt(int intNumber);
 };
 
 extern Spi SPI;

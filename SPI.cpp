@@ -16,7 +16,6 @@ namespace Arduino
 
 Spi SPI;
 
-
 Spi::Spi():
 theFd(-1),
 theSpiBus(0),
@@ -46,7 +45,6 @@ void Spi::end()
 void Spi::beginTransaction(SPISettings const & settings)
 {
    std::cerr << "Not implemented" << std::endl;
-
    if (theFd == -1)
    {
       openSpiBus(theSpiBus, theChipSelect);
