@@ -58,7 +58,28 @@ void Spi::endTransaction()
 
 void Spi::setBitOrder(SpiBitOrdering order)
 {
-   std::cerr << "Not implemented" << std::endl;
+   if (theFd == -1)
+   {
+      std::cerr << "Setting the bit ordering only does anything during a transaction" << std::endl;
+      return;
+   }
+
+   int8_t bo = (order == LSBFIRST ? SPI_LSB_FIRST : 0);
+
+   if (ioctl(theFd, SPI_IOC_RD_MODE, &bo) == -1)
+   {
+      std::cerr << "Error setting the bit ordering of read mode: " << strerror(errno) << std::endl;
+      return;
+   }
+
+   if (ioctl(theFd, SPI_IOC_WR_MODE, &bo) == -1)
+   {
+      std::cerr << "Error setting the bit ordering of write mode: " << strerror(errno) << std::endl;
+      return;
+   }
+
+   std::cout << "Set the bit ordering to " << (order == LSBFIRST ? "LSB First" : "MSB First") << std::endl;
+
 }
 
 void Spi::setClockDivider(uint8_t divider)

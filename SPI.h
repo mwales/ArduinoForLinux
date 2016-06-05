@@ -81,6 +81,9 @@ public:
    /**
     * This is not part of the arduino API, but used for Linux
     *
+    * @note It appeared to me on the O-Scope that the selected device had it's CS signal go low when
+    *       selected and data on it's way.  At all other times CS signal was high
+    *
     * @param cs Chipselect setting (0 or 1)
     */
    void setChipSelect(int cs);
@@ -96,6 +99,8 @@ public:
    int theSpiBus;
 
    int theChipSelect;
+
+   SpiBitOrdering theBitOrdering;
 
    SPISettings theCurrentSettings;
 
