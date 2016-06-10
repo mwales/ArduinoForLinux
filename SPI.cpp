@@ -47,8 +47,32 @@ void Spi::beginTransaction(SPISettings const & settings)
    std::cerr << "Not implemented" << std::endl;
    if (theFd == -1)
    {
-      openSpiBus(theSpiBus, theChipSelect);
+      bool openSuccess = openSpiBus(theSpiBus, theChipSelect);
+      if (!openSuccess)
+      {
+         std::cerr << "Error starting transaction, spidev failed to open" << std::endl;
+         return;
+      }
+
+      setBitOrder(settings.theOrder);
+
+      setDataMode(settings.theMode);
    }
+   else
+   {
+      // SPI device already open, are settings still consistent...
+      if (settings.theMode != theCurrentSettings.theMode)
+      {
+         setDataMode(settings.theMode);
+      }
+
+      if (settings.theOrder != theCurrentSettings.theOrder)
+      {
+         setBitOrder(settings.theOrder);
+      }
+   }
+
+   theCurrentSettings = settings;
 }
 
 void Spi::endTransaction()
@@ -64,15 +88,9 @@ void Spi::setBitOrder(SpiBitOrdering order)
       return;
    }
 
-   int8_t bo = (order == LSBFIRST ? SPI_LSB_FIRST : 0);
+   uint8_t bo = (order == LSBFIRST ? SPI_LSB_FIRST : 0);
 
-   if (ioctl(theFd, SPI_IOC_RD_MODE, &bo) == -1)
-   {
-      std::cerr << "Error setting the bit ordering of read mode: " << strerror(errno) << std::endl;
-      return;
-   }
-
-   if (ioctl(theFd, SPI_IOC_WR_MODE, &bo) == -1)
+   if (ioctl(theFd, SPI_IOC_WR_LSB_FIRST, &bo) == -1)
    {
       std::cerr << "Error setting the bit ordering of write mode: " << strerror(errno) << std::endl;
       return;
@@ -89,7 +107,44 @@ void Spi::setClockDivider(uint8_t divider)
 
 void Spi::setDataMode(SpiDataMode mode, int slaveSelectPin)
 {
-   std::cerr << "Not implemented" << std::endl;
+   if (theFd == -1)
+   {
+      std::cerr << "Setting the data mode only does anything during a transaction" << std::endl;
+      return;
+   }
+
+   uint8_t modeVar;
+   switch(mode)
+   {
+      case SPI_MODE0:
+         modeVar = SPI_MODE_0;
+         break;
+
+      case SPI_MODE1:
+         modeVar = SPI_MODE_1;
+         break;
+
+      case SPI_MODE2:
+         modeVar = SPI_MODE_2;
+         break;
+
+      case SPI_MODE3:
+         modeVar = SPI_MODE_3;
+         break;
+
+      default:
+         std::cerr << "SPI data mode of " << (int) mode << " is invalid" << std::endl;
+         return;
+   }
+
+   if (ioctl(theFd, SPI_IOC_WR_MODE, &modeVar) == -1)
+   {
+      std::cerr << "Error setting the data mode of write mode: " << strerror(errno) << std::endl;
+      return;
+   }
+
+   std::cout << "Set the data mode to SPI_MODE" << (int) mode << std::endl;
+
 }
 
 uint8_t Spi::transfer(uint8_t byteOfData)
@@ -181,11 +236,7 @@ void Spi::setSpiBus(int bus)
       // We need to reopen the SPI bus device file
       close(theFd);
       theFd = -1;
-
-
    }
-
-
 }
 
 void Spi::setChipSelect(int cs)

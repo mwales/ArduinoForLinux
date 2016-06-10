@@ -27,6 +27,7 @@ enum SpiDataMode
    SPI_MODE0,
    SPI_MODE1,
    SPI_MODE2,
+   SPI_MODE3
 };
 
 class SPISettings
@@ -65,10 +66,24 @@ public:
 
    void endTransaction();
 
+   /**
+    * Sets bit-order for MSB vs LSB
+    *
+    * Implemented but testing on RPi shows no difference in settings.  Might be a RPi issue, or
+    * maybe my code sucks, who knows...
+    *
+    * @param order
+    */
    void setBitOrder(SpiBitOrdering order);
 
    void setClockDivider(uint8_t divider);
 
+   /**
+    * Sets the SPI data transfer mode
+    *
+    * @param mode Modes are SPI_MODE0...3
+    * @param slaveSelectPin Doesn't do anything for Linux
+    */
    void setDataMode(SpiDataMode mode, int slaveSelectPin = 0);
 
    /**
