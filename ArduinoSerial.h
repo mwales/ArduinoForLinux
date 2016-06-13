@@ -35,6 +35,10 @@ public:
    void println(int num);
 
    void println(int num, int base);
+
+   void begin(int baudRate);
+
+   void flush();
 };
 
 extern SerialOutput Serial;

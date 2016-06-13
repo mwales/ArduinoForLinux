@@ -13,7 +13,7 @@ namespace Arduino
 {
 
 
-
+#define byte uint8_t
 
 class ArduinoOnLinux
 {
@@ -45,6 +45,14 @@ void digitalWrite(int, ArduinoGpioOutputLevel);
 void pinMode(int, ArduinoGpioMode);
 
 ArduinoGpioOutputLevel digitalRead(int);
+
+void delay(int ms);
+
+char*  itoa ( int value, char * str, int base );
+
+unsigned long millis();
+
+//void attachInterrupt(int pinNumber, void *isrRoutine(void), ArduinoGpioInterruptEdge);
 
 }
 

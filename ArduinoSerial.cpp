@@ -48,4 +48,14 @@ void SerialOutput::println(int num, int base)
    std::cout << num << std::endl;
 }
 
+void SerialOutput::begin(int baudRate)
+{
+   // No implementation required
+}
+
+void flush()
+{
+   // No implementation required
+}
+
 }

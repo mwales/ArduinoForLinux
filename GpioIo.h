@@ -19,6 +19,13 @@ enum ArduinoGpioMode
    OUTPUT
 };
 
+enum ArduinoGpioInterruptEdge
+{
+   CHANGE,
+   RISING,
+   FALLING
+};
+
 class GpioIo
 {
 public:

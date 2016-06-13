@@ -15,6 +15,8 @@ const uint8_t SPI_CLOCK_DIV32  = 32;
 const uint8_t SPI_CLOCK_DIV64  = 64;
 const uint8_t SPI_CLOCK_DIV128 = 128;
 
+#define SS 0 // Not used in Linux
+
 enum SpiBitOrdering
 {
    /// MSBFIRST is the most common
