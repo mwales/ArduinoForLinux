@@ -27,6 +27,8 @@ public:
 
    ArduinoGpioOutputLevel digitalRead(int);
 
+   void attachIsr(int pinNum, void (*gpioIsr)(), ArduinoGpioInterruptEdge edgeCondition);
+
 protected:
 
    ArduinoOnLinux();
@@ -52,7 +54,9 @@ char*  itoa ( int value, char * str, int base );
 
 unsigned long millis();
 
-//void attachInterrupt(int pinNumber, void *isrRoutine(void), ArduinoGpioInterruptEdge);
+int digitalPinToInterrupt(int pin);
+
+void attachInterrupt(int pinNumber, void (*isrRoutine)(), ArduinoGpioInterruptEdge edgeCondition);
 
 }
 

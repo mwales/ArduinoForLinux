@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include <fstream>
+#include <pthread.h>
 
 namespace Arduino
 {
@@ -40,15 +41,28 @@ public:
 
    void setMode(ArduinoGpioMode mode);
 
+   void attachInterrupt(void (*gpioIsr)(), ArduinoGpioInterruptEdge edgeCondition);
+
 protected:
 
    void exportGpio();
+
+   friend void* isrThreadMain(void* gpioParam);
 
    int thePin;
 
    ArduinoGpioMode theMode;
 
    std::fstream theGpioValueFile;
+
+   pthread_t theIsrThread;
+
+   bool theIsrCreated;
+
+   /// Set to true to signal thread to quit
+   bool theThreadStopEvent;
+
+   void (*theIsrCallbackFunc)();
 };
 
 }

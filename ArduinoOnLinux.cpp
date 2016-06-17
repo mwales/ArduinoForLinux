@@ -50,6 +50,11 @@ ArduinoGpioOutputLevel ArduinoOnLinux::digitalRead(int pinNum)
    return GetGpio(pinNum)->getLevel();
 }
 
+void ArduinoOnLinux::attachIsr(int pinNum, void (*gpioIsr)(), ArduinoGpioInterruptEdge edgeCondition )
+{
+   GetGpio(pinNum)->attachInterrupt(gpioIsr, edgeCondition);
+}
+
 GpioIo* ArduinoOnLinux::GetGpio(int pinNum)
 {
    auto it = theGpios.find(pinNum);
@@ -126,9 +131,21 @@ unsigned long millis()
    return seconds * 1000 + milliseconds;
 }
 
-//void attachInterrupt(int pinNumber, void *isrRoutine(void), ArduinoGpioInterruptEdge)
-//{
+int digitalPinToInterrupt(int pin)
+{
+   // Doesn't do anything in Linux
+   return pin;
+}
 
-//}
+void attachInterrupt(int pinNumber, void (*isrRoutine)(), ArduinoGpioInterruptEdge edgeCondition)
+{
+   isrRoutine();
+
+   // Set the GPIO for input mode
+   pinMode(pinNumber, INPUT);
+
+   ArduinoOnLinux::getInstance()->attachIsr(pinNumber, isrRoutine, edgeCondition);
+
+}
 
 }
